@@ -1,75 +1,71 @@
-# React + TypeScript + Vite
+# Production Control Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A single-screen dashboard for an operations manager to track jobs, machine assignment, and issues needing attention.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React + TypeScript + Vite
+- Tailwind CSS
+- shadcn/ui-style components built on Radix primitives
+- lucide-react icons
 
-## React Compiler
+No backend — jobs are a static mock dataset (`src/lib/mock-data.ts`), and status updates are held in local React state.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Getting Started
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+pnpm install
+pnpm dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Open `http://localhost:5173`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Build
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+pnpm build
+pnpm preview
+```
+
+## Deploying to Vercel
+
+This is a plain Vite app, so no extra config is needed.
+
+1. Push the repo to GitHub.
+2. Import it in [Vercel](https://vercel.com/new).
+3. Vercel auto-detects the Vite framework preset:
+   - Build command: `pnpm build`
+   - Output directory: `dist`
+4. Deploy.
+
+## Project Structure
 
 ```
+src/
+  App.tsx                     — page composition, owns jobs[] and selectedJobId
+  lib/
+    types.ts                  — Job, Machine, JobStatus, JobNote
+    mock-data.ts              — static jobs[] and machines[]
+    job-filters.ts            — pure filterJobs / searchJobs / sortJobs / isDueToday
+    utils.ts                  — cn() classname helper
+  hooks/
+    use-jobs-filter.ts        — search/status/sort state, returns the derived job list
+  components/
+    dashboard/                — summary-cards, jobs-toolbar, jobs-table, status-badge, job-detail-panel
+    ui/                       — button, input, select, sheet, table primitives
+```
+
+`jobs-table.tsx` is presentational only — all filtering, searching, and sorting happens in `useJobsFilter`.
+
+## Assumptions
+
+- **Delayed** is a manually set status, not derived from the due date. A separate `isDueToday` check drives the "Due Today" summary count.
+- No backend or fetch simulation — jobs are a local array, so there's no loading/error state for initial data. The status update flow still simulates a network round trip (`setTimeout`) before committing.
+- Sorting is triggered from the table's column headers (Quantity, Due Date), plus a compact sort menu on mobile where the headers aren't visible.
+- The table paginates 9 jobs per page instead of scrolling.
+
+## What I'd Improve With More Time
+
+- Persist jobs to `localStorage` or a real API so a refresh doesn't reset state.
+- Multi-select status filter and a dedicated "overdue" quick filter.
+- Keyboard navigation between table rows.
