@@ -49,11 +49,10 @@ src/
     layout.tsx                — html/body shell and metadata
     loading.tsx               — streamed skeleton shown while page.tsx resolves
     error.tsx                 — error boundary with a working Retry
-    api/jobs/route.ts         — GET returns the mock jobs array
   lib/
     types.ts                  — Job, Machine, JobStatus, JobNote
     mock-data.ts              — static jobs[] and machines[]
-    jobs-service.ts           — getJobs(); the single data source for page + route
+    jobs-service.ts           — getJobs(); the single data source
     job-filters.ts            — pure filterJobs / searchJobs / sortJobs / isOverdue / isDueToday
     machines.ts               — machineById / machineName, indexed once
     date.ts                   — local-calendar ISO helpers and display formatting
@@ -78,7 +77,7 @@ src/
 
 `jobs-table.tsx` is presentational: it renders the `jobs` array it is handed and derives nothing. Filtering, searching, sorting **and pagination** all happen in `useJobsFilter`. Pagination lives there rather than in the table because the page number is a function of the filtered list — keeping it in the table let the two disagree.
 
-The three non-data states are visually distinct: **loading** is a grey shimmer of the table's shape, **error** is a red-tinted panel with a Retry button, **empty** is a dashed outline with a Reset filters button.
+The three non-data states are visually distinct: **loading** is a grey shimmer in the table's place, **error** is a red-tinted panel with a Retry button, **empty** is a dashed outline with a Reset filters button.
 
 ## Accessibility
 

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { filterJobs, searchJobs, sortJobs, type SortDirection, type SortKey } from '@/lib/job-filters'
 import type { Job, JobStatus } from '@/lib/types'
 
@@ -24,17 +24,11 @@ export function useJobsFilter(jobs: Job[]) {
     setPage(1)
   }
 
-  const visibleJobs = useMemo(
-    () => sortJobs(searchJobs(filterJobs(jobs, statusFilter), searchTerm), sortKey, sortDirection),
-    [jobs, statusFilter, searchTerm, sortKey, sortDirection],
-  )
+  const visibleJobs = sortJobs(searchJobs(filterJobs(jobs, statusFilter), searchTerm), sortKey, sortDirection)
 
   const totalPages = Math.max(1, Math.ceil(visibleJobs.length / PAGE_SIZE))
   const currentPage = Math.min(page, totalPages)
-  const pageJobs = useMemo(
-    () => visibleJobs.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
-    [visibleJobs, currentPage],
-  )
+  const pageJobs = visibleJobs.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
 
   function goToPage(next: number) {
     setPage(Math.min(Math.max(next, 1), totalPages))
@@ -69,7 +63,6 @@ export function useJobsFilter(jobs: Job[]) {
     sortDirection,
     toggleSort,
     setSort,
-    visibleJobs,
     pageJobs,
     page: currentPage,
     totalPages,

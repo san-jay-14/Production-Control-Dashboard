@@ -1,17 +1,4 @@
-const MONTHS = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
-] as const
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 export function toISODate(date: Date): string {
   const year = date.getFullYear()
@@ -25,12 +12,7 @@ export function todayISO(): string {
 }
 
 export function formatDate(iso: string): string {
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso)
-  if (!match) return iso
-
-  const [, year, month, day] = match
+  const [year, month, day] = iso.split('-')
   const monthName = MONTHS[Number(month) - 1]
-  if (!monthName) return iso
-
-  return `${monthName} ${Number(day)}, ${year}`
+  return monthName ? `${monthName} ${Number(day)}, ${year}` : iso
 }

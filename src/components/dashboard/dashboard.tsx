@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { DashboardShell } from '@/components/dashboard/dashboard-shell'
 import { SummaryCards } from '@/components/dashboard/summary-cards'
 import { JobsToolbar } from '@/components/dashboard/jobs-toolbar'
@@ -35,10 +35,7 @@ export function Dashboard({ initialJobs, greeting }: DashboardProps) {
     reset,
   } = useJobsFilter(jobs)
 
-  const selectedJob = useMemo(
-    () => jobs.find((job) => job.id === selectedJobId),
-    [jobs, selectedJobId],
-  )
+  const selectedJob = jobs.find((job) => job.id === selectedJobId)
 
   function selectJob(jobId: string) {
     triggerRef.current = document.activeElement as HTMLElement | null
