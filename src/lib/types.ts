@@ -1,4 +1,6 @@
-export type JobStatus = 'Pending' | 'In Progress' | 'Delayed' | 'Completed'
+export const JOB_STATUSES = ['Pending', 'In Progress', 'Delayed', 'Completed'] as const
+
+export type JobStatus = (typeof JOB_STATUSES)[number]
 
 export type MachineStatus = 'Idle' | 'Running' | 'Maintenance'
 

@@ -20,12 +20,18 @@ export function searchJobs(jobs: Job[], searchTerm: string): Job[] {
 export type SortKey = 'dueDate' | 'quantity'
 export type SortDirection = 'asc' | 'desc'
 
+function compareBy(a: Job, b: Job, sortKey: SortKey): number {
+  switch (sortKey) {
+    case 'quantity':
+      return a.quantity - b.quantity
+    case 'dueDate':
+      return a.dueDate.localeCompare(b.dueDate)
+  }
+}
+
 export function sortJobs(jobs: Job[], sortKey: SortKey, sortDirection: SortDirection): Job[] {
-  const sorted = [...jobs].sort((a, b) => {
-    if (sortKey === 'quantity') return a.quantity - b.quantity
-    return a.dueDate.localeCompare(b.dueDate)
-  })
-  return sortDirection === 'asc' ? sorted : sorted.reverse()
+  const direction = sortDirection === 'asc' ? 1 : -1
+  return [...jobs].sort((a, b) => compareBy(a, b, sortKey) * direction)
 }
 
 export function isOverdue(job: Job): boolean {

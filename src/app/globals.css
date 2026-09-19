@@ -5,12 +5,11 @@
   --color-background: #ffffff;
   --color-foreground: #0a0a0a;
   --color-muted: #f4f4f5;
-  --color-muted-foreground: #71717a;
+  --color-muted-foreground: #52525b;
   --color-border: #e4e4e7;
-  --color-accent: #f4f4f5;
   --color-primary: #0a0a0a;
   --color-primary-foreground: #ffffff;
-  --color-destructive: #0a0a0a;
+  --color-destructive: #b91c1c;
 }
 
 body {
@@ -18,8 +17,4 @@ body {
   background: var(--color-background);
   color: var(--color-foreground);
   font-family: 'Poppins', system-ui, sans-serif;
-}
-
-#root {
-  min-height: 100vh;
 }

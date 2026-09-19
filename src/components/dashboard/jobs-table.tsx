@@ -1,22 +1,19 @@
 import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight, PackageSearch } from 'lucide-react'
-import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { StatusBadge } from '@/components/dashboard/status-badge'
-import { machines } from '@/lib/mock-data'
+import { DueDate } from '@/components/dashboard/due-date'
+import { machineName } from '@/lib/machines'
 import type { SortDirection, SortKey } from '@/lib/job-filters'
 import type { Job } from '@/lib/types'
-
-const PAGE_SIZE = 9
-
-function machineName(machineId: string): string {
-  return machines.find((m) => m.id === machineId)?.name ?? 'Unassigned'
-}
 
 interface JobsTableProps {
   jobs: Job[]
   sortKey: SortKey
   sortDirection: SortDirection
+  page: number
+  totalPages: number
+  onPageChange: (page: number) => void
   onToggleSort: (key: SortKey) => void
   onSelectJob: (jobId: string) => void
   onResetFilters: () => void
@@ -27,19 +24,22 @@ function SortIcon({ active, direction }: { active: boolean; direction: SortDirec
   return direction === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
 }
 
+function ariaSort(active: boolean, direction: SortDirection): 'ascending' | 'descending' | 'none' {
+  if (!active) return 'none'
+  return direction === 'asc' ? 'ascending' : 'descending'
+}
+
 export function JobsTable({
   jobs,
   sortKey,
   sortDirection,
+  page,
+  totalPages,
+  onPageChange,
   onToggleSort,
   onSelectJob,
   onResetFilters,
 }: JobsTableProps) {
-  const [page, setPage] = useState(1)
-  const totalPages = Math.max(1, Math.ceil(jobs.length / PAGE_SIZE))
-  const currentPage = Math.min(page, totalPages)
-  const pageJobs = jobs.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
-
   if (jobs.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-border py-16">
@@ -54,25 +54,28 @@ export function JobsTable({
 
   return (
     <>
-      <div className="hidden rounded-lg border border-border md:block">
+      <div className="hidden min-h-0 flex-1 overflow-auto rounded-lg border border-border md:block">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Job ID</TableHead>
               <TableHead>Product</TableHead>
               <TableHead>Customer</TableHead>
-              <TableHead className="text-center">
+              <TableHead
+                className="text-center"
+                aria-sort={ariaSort(sortKey === 'quantity', sortDirection)}
+              >
                 <button
-                  className="flex w-full items-center justify-center gap-1"
+                  className="flex w-full items-center justify-center gap-1 rounded-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground"
                   onClick={() => onToggleSort('quantity')}
                 >
                   Quantity
                   <SortIcon active={sortKey === 'quantity'} direction={sortDirection} />
                 </button>
               </TableHead>
-              <TableHead>
+              <TableHead aria-sort={ariaSort(sortKey === 'dueDate', sortDirection)}>
                 <button
-                  className="flex items-center gap-1"
+                  className="flex items-center gap-1 rounded-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground"
                   onClick={() => onToggleSort('dueDate')}
                 >
                   Due Date
@@ -84,20 +87,24 @@ export function JobsTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {pageJobs.map((job) => (
-              <TableRow
-                key={job.id}
-                tabIndex={0}
-                role="button"
-                onClick={() => onSelectJob(job.id)}
-                onKeyDown={(e) => e.key === 'Enter' && onSelectJob(job.id)}
-                className="cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground"
-              >
-                <TableCell className="font-medium">{job.id}</TableCell>
+            {jobs.map((job) => (
+              <TableRow key={job.id} onClick={() => onSelectJob(job.id)} className="cursor-pointer">
+                <TableCell className="font-medium">
+                  <button
+                    type="button"
+                    aria-haspopup="dialog"
+                    onClick={() => onSelectJob(job.id)}
+                    className="rounded-sm underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground"
+                  >
+                    {job.id}
+                  </button>
+                </TableCell>
                 <TableCell className="max-w-48 truncate">{job.productName}</TableCell>
                 <TableCell className="max-w-36 truncate">{job.customerName}</TableCell>
                 <TableCell className="text-center">{job.quantity.toLocaleString()}</TableCell>
-                <TableCell>{job.dueDate}</TableCell>
+                <TableCell>
+                  <DueDate job={job} />
+                </TableCell>
                 <TableCell>{machineName(job.machineId)}</TableCell>
                 <TableCell>
                   <StatusBadge status={job.status} />
@@ -109,47 +116,52 @@ export function JobsTable({
       </div>
 
       <div className="flex flex-col gap-2 md:hidden">
-        {pageJobs.map((job) => (
-          <div
+        {jobs.map((job) => (
+          <button
             key={job.id}
-            tabIndex={0}
-            role="button"
+            type="button"
+            aria-haspopup="dialog"
             onClick={() => onSelectJob(job.id)}
-            onKeyDown={(e) => e.key === 'Enter' && onSelectJob(job.id)}
-            className="flex flex-col gap-1.5 rounded-lg border border-border p-3 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground"
+            className="flex w-full flex-col gap-1.5 rounded-lg border border-border p-3 text-left focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-foreground"
           >
-            <div className="flex items-center justify-between">
+            <span className="flex items-center justify-between">
               <span className="text-sm font-medium">{job.id}</span>
               <StatusBadge status={job.status} />
-            </div>
-            <p className="truncate text-sm">{job.productName}</p>
-            <p className="text-xs text-muted-foreground">{job.customerName}</p>
-            <div className="flex justify-between text-xs text-muted-foreground">
+            </span>
+            <span className="block truncate text-sm">{job.productName}</span>
+            <span className="block truncate text-xs text-muted-foreground">
+              {job.customerName} · {machineName(job.machineId)}
+            </span>
+            <span className="flex justify-between text-xs text-muted-foreground">
               <span>Qty {job.quantity.toLocaleString()}</span>
-              <span>Due {job.dueDate}</span>
-            </div>
-          </div>
+              <span>
+                Due <DueDate job={job} />
+              </span>
+            </span>
+          </button>
         ))}
       </div>
 
-      <div className="mt-3 flex items-center justify-between text-sm text-muted-foreground">
-        <span>
-          Page {currentPage} of {totalPages}
+      <div className="mt-3 flex shrink-0 items-center justify-between text-sm text-muted-foreground">
+        <span aria-live="polite">
+          Page {page} of {totalPages}
         </span>
         <div className="flex gap-2">
           <Button
             variant="outline"
             size="icon"
-            disabled={currentPage === 1}
-            onClick={() => setPage(currentPage - 1)}
+            aria-label="Previous page"
+            disabled={page === 1}
+            onClick={() => onPageChange(page - 1)}
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <Button
             variant="outline"
             size="icon"
-            disabled={currentPage === totalPages}
-            onClick={() => setPage(currentPage + 1)}
+            aria-label="Next page"
+            disabled={page === totalPages}
+            onClick={() => onPageChange(page + 1)}
           >
             <ChevronRight className="h-4 w-4" />
           </Button>

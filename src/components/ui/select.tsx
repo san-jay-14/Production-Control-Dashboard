@@ -2,14 +2,19 @@ import * as SelectPrimitive from '@radix-ui/react-select'
 import { Check, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-const Select = SelectPrimitive.Root
-const SelectValue = SelectPrimitive.Value
+export const Select = SelectPrimitive.Root
+export const SelectValue = SelectPrimitive.Value
 
-function SelectTrigger({
+interface SelectTriggerProps extends SelectPrimitive.SelectTriggerProps {
+  showChevron?: boolean
+}
+
+export function SelectTrigger({
   className,
   children,
+  showChevron = true,
   ...props
-}: SelectPrimitive.SelectTriggerProps) {
+}: SelectTriggerProps) {
   return (
     <SelectPrimitive.Trigger
       className={cn(
@@ -19,14 +24,16 @@ function SelectTrigger({
       {...props}
     >
       {children}
-      <SelectPrimitive.Icon asChild>
-        <ChevronDown className="h-4 w-4 opacity-50" />
-      </SelectPrimitive.Icon>
+      {showChevron && (
+        <SelectPrimitive.Icon asChild>
+          <ChevronDown className="h-4 w-4 opacity-50" />
+        </SelectPrimitive.Icon>
+      )}
     </SelectPrimitive.Trigger>
   )
 }
 
-function SelectContent({
+export function SelectContent({
   className,
   children,
   ...props
@@ -48,15 +55,11 @@ function SelectContent({
   )
 }
 
-function SelectItem({
-  className,
-  children,
-  ...props
-}: SelectPrimitive.SelectItemProps) {
+export function SelectItem({ className, children, ...props }: SelectPrimitive.SelectItemProps) {
   return (
     <SelectPrimitive.Item
       className={cn(
-        'relative flex cursor-pointer select-none items-center rounded-sm py-1.5 pl-7 pr-3 text-sm outline-none data-[highlighted]:bg-accent',
+        'relative flex cursor-pointer select-none items-center rounded-sm py-1.5 pl-7 pr-3 text-sm outline-none data-[highlighted]:bg-muted',
         className,
       )}
       {...props}
@@ -70,5 +73,3 @@ function SelectItem({
     </SelectPrimitive.Item>
   )
 }
-
-export { Select, SelectTrigger, SelectValue, SelectContent, SelectItem }

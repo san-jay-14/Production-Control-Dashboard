@@ -1,7 +1,7 @@
-import type { HTMLAttributes, TdHTMLAttributes, ThHTMLAttributes } from 'react'
+import type { ComponentProps } from 'react'
 import { cn } from '@/lib/utils'
 
-function Table({ className, ...props }: HTMLAttributes<HTMLTableElement>) {
+export function Table({ className, ...props }: ComponentProps<'table'>) {
   return (
     <div className="w-full overflow-auto">
       <table className={cn('w-full text-sm', className)} {...props} />
@@ -9,19 +9,19 @@ function Table({ className, ...props }: HTMLAttributes<HTMLTableElement>) {
   )
 }
 
-function TableHeader({ className, ...props }: HTMLAttributes<HTMLTableSectionElement>) {
+export function TableHeader({ className, ...props }: ComponentProps<'thead'>) {
   return <thead className={cn('border-b border-border', className)} {...props} />
 }
 
-function TableBody({ className, ...props }: HTMLAttributes<HTMLTableSectionElement>) {
+export function TableBody({ className, ...props }: ComponentProps<'tbody'>) {
   return <tbody className={cn('divide-y divide-border', className)} {...props} />
 }
 
-function TableRow({ className, ...props }: HTMLAttributes<HTMLTableRowElement>) {
+export function TableRow({ className, ...props }: ComponentProps<'tr'>) {
   return <tr className={cn('hover:bg-muted', className)} {...props} />
 }
 
-function TableHead({ className, ...props }: ThHTMLAttributes<HTMLTableCellElement>) {
+export function TableHead({ className, ...props }: ComponentProps<'th'>) {
   return (
     <th
       className={cn(
@@ -33,8 +33,6 @@ function TableHead({ className, ...props }: ThHTMLAttributes<HTMLTableCellElemen
   )
 }
 
-function TableCell({ className, ...props }: TdHTMLAttributes<HTMLTableCellElement>) {
+export function TableCell({ className, ...props }: ComponentProps<'td'>) {
   return <td className={cn('px-4 py-3 align-middle', className)} {...props} />
 }
-
-export { Table, TableHeader, TableBody, TableRow, TableHead, TableCell }
