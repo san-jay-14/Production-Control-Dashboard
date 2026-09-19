@@ -24,21 +24,24 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
 
 interface JobDetailPanelProps {
   job: Job | undefined
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  onClose: () => void
   onUpdateStatus: UpdateStatus
   onRestoreFocus?: () => void
 }
 
 export function JobDetailPanel({
   job,
-  open,
-  onOpenChange,
+  onClose,
   onUpdateStatus,
   onRestoreFocus,
 }: JobDetailPanelProps) {
   return (
-    <Sheet open={open && job !== undefined} onOpenChange={onOpenChange}>
+    <Sheet
+      open={job !== undefined}
+      onOpenChange={(open) => {
+        if (!open) onClose()
+      }}
+    >
       <SheetContent
         onCloseAutoFocus={(event) => {
           if (!onRestoreFocus) return

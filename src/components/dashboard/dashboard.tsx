@@ -86,8 +86,7 @@ export function Dashboard({ initialJobs, greeting }: DashboardProps) {
 
       <JobDetailPanel
         job={selectedJob}
-        open={selectedJobId !== null}
-        onOpenChange={(open) => !open && setSelectedJobId(null)}
+        onClose={() => setSelectedJobId(null)}
         onUpdateStatus={updateJobStatus}
         onRestoreFocus={restoreFocus}
       />
